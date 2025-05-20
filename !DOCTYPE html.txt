@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyxel Airdrop 2.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6e0ad6;
+            --secondary: #8a2be2;
+            --accent: #ff6b00;
+            --dark: #0f051d;
+            --light: #f8f9fa;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --gray: #6c757d;
+            --dark-purple: #4b0082;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            touch-action: manipulation;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+            position: relative;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            cursor: pointer;
+            color: var(--light);
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tab i {
+            font-size: 16px;
+        }
+        
+        .tab.active {
+            background-color: var(--accent);
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .tab-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .content {
+            background-color: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .click-area {
+            background: linear-gradient(135deg, var(--secondary), var(--dark-purple));
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 0 20px rgba(255,255,255,0.1);
+            transition: transform 0.1s, box-shadow 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .click-area:active {
+            transform: translateY(4px) scale(0.98);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2), inset 0 0 20px rgba(255,255,255,0.1);
+        }
+        
+        .click-area::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .click-area:active::after {
+            opacity: 1;
+            transform: scale(0);
+            transition: transform 0.5s, opacity 0.5s;
+        }
+        
+        .token-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255,107,0,0.5);
+            transition: transform 0.2s;
+        }
+        
+        .click-area:active .token-icon {
+            transform: scale(0.9);
+        }
+        
+        .click-reward {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+        }
+        
+        .click-area:active .click-reward {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .energy-container {
+            margin-bottom: 20px;
+        }
+        
+        .energy-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ff9e00);
+            border-radius: 6px;
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                          rgba(255,255,255,0) 0%, 
+                          rgba(255,255,255,0.3) 50%, 
+                          rgba(255,255,255,0) 100%);
+            animation: progressShine 2s infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .stat-value span {
+            font-size: 12px;
+            color: var(--accent);
+        }
+        
+        .button {
+            background: linear-gradient(135deg, var(--accent), #ff8c00);
+            color: var(--dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .button.secondary {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+        }
+        
+        .button.success {
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            color: white;
+        }
+        
+        .button.info {
+            background: linear-gradient(135deg, var(--info), #117a8b);
+            color: white;
+        }
+        
+        .button.warning {
+            background: linear-gradient(135deg, var(--warning), #e0a800);
+            color: var(--dark);
+        }
+        
+        .button.claimable {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 4px 12px rgba(255,107,0,0.4); }
+            100% { transform: scale(1); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title i {
+            font-size: 18px;
+        }
+        
+        .quest-card {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .quest-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quest-title i {
+            color: var(--accent);
+        }
+        
+        .quest-reward {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .quest-description {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .quest-progress {
+            margin-top: 10px;
+        }
+        
+        .quest-progress-text {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .social-link {
+            display: inline-block;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .social-link:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .social-link i {
+            margin-right: 5px;
+        }
+        
+        .inventory-item {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            gap: 15px;
+        }
+        
+        .inventory-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), #ff8c00);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--dark);
+            flex-shrink: 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .inventory-info {
+            flex: 1;
+        }
+        
+        .inventory-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .inventory-description {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .inventory-timer {
+            font-size: 11px;
+            color: var(--accent);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .exchange-card {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        
+        .exchange-rate {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .exchange-rate-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 5px 0;
+        }
+        
+        .exchange-input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .exchange-input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .exchange-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255,107,0,0.2);
+        }
+        
+        .exchange-input-label {
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background-color: var(--dark);
+            padding: 0 5px;
+            font-size: 11px;
+            color: var(--gray);
+        }
+        
+        .swap-icon {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            color: var(--accent);
+        }
+        
+        .profile-card {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .profile-details {
+            flex: 1;
+        }
+        
+        .profile-username {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-referral {
+            font-size: 12px;
+            color: var(--gray);
+            background-color: rgba(255,255,255,0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .profile-input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255,107,0,0.2);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--success), #1e7e34);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s forwards;
+            max-width: 90%;
+        }
+        
+        @keyframes slideIn {
+            from { top: -100px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { top: 20px; opacity: 1; }
+            to { top: -100px; opacity: 0; }
+        }
+        
+        .notification i {
+            font-size: 18px;
+        }
+        
+        .intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark), #1a0033);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeOut 1s 3s forwards;
+        }
+        
+        .intro-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(90deg, var(--accent), #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            position: relative;
+        }
+        
+        .intro-logo::after {
+            content: 'Airdrop';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            background: none;
+            -webkit-text-fill-color: var(--accent);
+        }
+        
+        .intro-progress {
+            width: 80%;
+            height: 8px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        
+        .intro-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), #ff8c00);
+            animation: loadProgress 3s forwards;
+        }
+        
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.7;
+        }
+        
+        .badge {
+            display: inline-block;
+            background-color: var(--accent);
+            color: var(--dark);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0,0,0,0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .tab {
+                font-size: 10px;
+                padding: 10px 0;
+            }
+            
+            .tab i {
+                font-size: 14px;
+            }
+            
+            .token-icon {
+                font-size: 50px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            .quest-title {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-overlay" id="intro-overlay">
+        <div class="intro-logo">NYXEL</div>
+        <div class="intro-progress">
+            <div class="intro-progress-bar"></div>
+        </div>
+    </div>
+    
+    <div class="container" id="game-container" style="display: none;">
+        <div class="header">
+            <h1>NYXEL AIRDROP 2.0</h1>
+            <p>Mine NYXL tokens and earn rewards!</p>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab active" onclick="switchTab('main')" aria-label="Main Tab">
+                <i class="fas fa-home"></i>
+                <span>Main</span>
+                <div class="tab-badge hidden" id="main-badge">1</div>
+            </div>
+            <div class="tab" onclick="switchTab('profile')" aria-label="Profile Tab">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </div>
+            <div class="tab" onclick="switchTab('quests')" aria-label="Quests Tab">
+                <i class="fas fa-tasks"></i>
+                <span>Quests</span>
+                <div class="tab-badge hidden" id="quests-badge">3</div>
+            </div>
+            <div class="tab" onclick="switchTab('exchange')" aria-label="Swap Tab">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Swap</span>
+            </div>
+            <div class="tab" onclick="switchTab('inventory')" aria-label="Items Tab">
+                <i class="fas fa-box-open"></i>
+                <span>Items</span>
+                <div class="tab-badge hidden" id="inventory-badge">2</div>
+            </div>
+            <div class="tab" onclick="switchTab('earn')" aria-label="Earn Tab">
+                <i class="fas fa-coins"></i>
+                <span>Earn</span>
+                <div class="tab-badge hidden" id="earn-badge">1</div>
+            </div>
+        </div>
+        
+        <div id="main-content" class="content active">
+            <div class="click-area" id="clicker" onclick="mineToken(event)" aria-label="Mine Tokens Area">
+                <div class="token-icon">💎</div>
+                <div style="font-size: 14px; font-weight: 500;">Tap to Mine NYXL</div>
+                <div class="click-reward" id="click-reward">+0.05 NYXL</div>
+            </div>
+            
+            <div class="energy-container">
+                <div class="energy-header">
+                    <span>Energy</span>
+                    <span id="energy-label">300/300</span>
+                </div>
+                <div class="progress-container">
+                    <div id="energy-bar" class="progress-bar"></div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">NYXL Tokens</div>
+                    <div class="stat-value" id="token-count">0 <span>NYXL</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">USDT Balance</div>
+                    <div class="stat-value" id="usdt-count">0 <span>USDT</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">XP</div>
+                    <div class="stat-value" id="xp-count">0 <span>XP</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="level-count">1</div>
+                </div>
+            </div>
+            
+            <div class="energy-container">
+                <div class="energy-header">
+                    <span>Level Progress</span>
+                    <span id="xp-label">0/100</span>
+                </div>
+                <div class="progress-container">
+                    <div id="xp-progress" class="progress-bar"></div>
+                </div>
+            </div>
+            
+            <button class="button success" onclick="claimHourlyBonus()" id="hourly-bonus" aria-label="Claim Hourly Bonus">
+                <i class="fas fa-gift"></i> CLAIM HOURLY BONUS
+            </button>
+            <button class="button secondary" onclick="openReferral()" aria-label="Invite Friends">
+                <i class="fas fa-user-plus"></i> INVITE FRIENDS
+            </button>
+        </div>
+        
+        <div id="profile-content" class="content">
+            <div class="profile-card">
+                <div class="profile-info">
+                    <div class="profile-avatar" id="profile-avatar">P</div>
+                    <div class="profile-details">
+                        <div class="profile-username" id="username">Player123</div>
+                        <div class="profile-referral" id="referral-code">NYX123</div>
+                    </div>
+                </div>
+                
+                <input type="text" id="username-input" placeholder="Enter new username" class="profile-input" aria-label="Change Username">
+                <button class="button" onclick="changeUsername()" id="username-button" aria-label="Save Username">
+                    <i class="fas fa-save"></i> SAVE USERNAME
+                </button>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i> STATISTICS
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Clicks</div>
+                    <div class="stat-value" id="total-clicks">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Earned</div>
+                    <div class="stat-value" id="total-earned">0 <span>NYXL</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Referral Earnings</div>
+                    <div class="stat-value" id="referral-earned">0 <span>NYXL</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Play Time</div>
+                    <div class="stat-value" id="play-time">0 <span>min</span></div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <i class="fas fa-wallet"></i> WALLET ADDRESS
+            </div>
+            
+            <div class="profile-card">
+                <div style="font-size: 12px; color: var(--gray); margin-bottom: 10px;">
+                    Add your wallet address to receive tokens after airdrop ends
+                </div>
+                <input type="text" id="wallet-input" placeholder="0x..." class="profile-input" aria-label="Wallet Address">
+                <button class="button info" onclick="saveWallet()" aria-label="Save Wallet">
+                    <i class="fas fa-link"></i> CONNECT WALLET
+                </button>
+            </div>
+        </div>
+        
+        <div id="quests-content" class="content">
+            <div class="section-title">
+                <i class="fas fa-calendar-day"></i> DAILY QUESTS
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-mouse-pointer"></i> Click 50 Times
+                        <span class="badge hidden" id="quest1-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">10 NYXL</div>
+                </div>
+                <div class="quest-description">Tap the diamond 50 times to complete this quest</div>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest1-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest1-label">0/50</span>
+                        <span>Clicks</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(1)" id="quest1-button" aria-label="Claim Click 50 Times Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-user-plus"></i> Invite 1 Friend
+                        <span class="badge hidden" id="quest2-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">25 NYXL</div>
+                </div>
+                <div class="quest-description">Share your referral link with friends</div>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest2-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest2-label">0/1</span>
+                        <span>Invites</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(2)" id="quest2-button" aria-label="Claim Invite 1 Friend Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-clock"></i> Play for 3 Hours
+                        <span class="badge hidden" id="quest3-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">50 NYXL</div>
+                </div>
+                <div class="quest-description">Stay active in the game for 3 hours</div>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest3-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest3-label">0/180</span>
+                        <span>Minutes</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(3)" id="quest3-button" aria-label="Claim Play for 3 Hours Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="section-title" style="margin-top: 25px;">
+                <i class="fas fa-calendar-week"></i> WEEKLY QUESTS
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-mouse-pointer"></i> Click 500 Times
+                        <span class="badge hidden" id="quest4-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">100 NYXL</div>
+                </div>
+                <div class="quest-description">Tap the diamond 500 times to complete this quest</div>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest4-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest4-label">0/500</span>
+                        <span>Clicks</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(4)" id="quest4-button" aria-label="Claim Click 500 Times Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-user-plus"></i> Invite 5 Friends
+                        <span class="badge hidden" id="quest5-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">250 NYXL</div>
+                </div>
+                <div class="quest-description">Invite 5 friends to join the game</div>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest5-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest5-label">0/5</span>
+                        <span>Invites</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(5)" id="quest5-button" aria-label="Claim Invite 5 Friends Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="section-title" style="margin-top: 25px;">
+                <i class="fas fa-users"></i> SOCIAL QUESTS
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fab fa-twitter"></i> Follow on X
+                        <span class="badge hidden" id="quest6-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">25 NYXL</div>
+                </div>
+                <div class="quest-description">Follow our official X (Twitter) account</div>
+                <a href="https://x.com/nyxelapp?s=21" target="_blank" class="social-link">
+                    <i class="fab fa-twitter"></i> Follow @nyxelapp
+                </a>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest6-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest6-label">0/1</span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(6)" id="quest6-button" aria-label="Claim Follow on X Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fab fa-telegram"></i> Join Telegram
+                        <span class="badge hidden" id="quest7-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">25 NYXL</div>
+                </div>
+                <div class="quest-description">Join our official Telegram community</div>
+                <a href="https://t.me/nyxelofficial" target="_blank" class="social-link">
+                    <i class="fab fa-telegram"></i> Join Telegram
+                </a>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="quest7-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="quest7-label">0/1</span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimQuest(7)" id="quest7-button" aria-label="Claim Join Telegram Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+        </div>
+        
+        <div id="exchange-content" class="content">
+            <div class="exchange-card">
+                <div class="exchange-rate">Current Exchange Rate</div>
+                <div class="exchange-rate-value">1 NYXL = $0.0025</div>
+                <div style="font-size: 12px; color: var(--gray);">~400 NYXL = $1 USDT</div>
+            </div>
+            
+            <div class="exchange-input-container">
+                <div class="exchange-input-label">You pay</div>
+                <input type="number" id="nyxl-amount" placeholder="0.00" class="exchange-input" aria-label="NYXL Amount to Swap">
+            </div>
+            
+            <div class="swap-icon">
+                <i class="fas fa-arrow-down" style="font-size: 20px; color: var(--accent);"></i>
+            </div>
+            
+            <div class="exchange-input-container">
+                <div class="exchange-input-label">You receive</div>
+                <input type="number" id="usdt-amount" placeholder="0.00" class="exchange-input" readonly aria-label="USDT Amount Received">
+            </div>
+            
+            <button class="button success" onclick="swapToUSDT()" aria-label="Swap to USDT">
+                <i class="fas fa-exchange-alt"></i> SWAP TO USDT
+            </button>
+            
+            <div class="stats-grid" style="margin-top: 20px;">
+                <div class="stat-card">
+                    <div class="stat-label">NYXL Balance</div>
+                    <div class="stat-value" id="exchange-nyxl-balance">0 <span>NYXL</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">USDT Balance</div>
+                    <div class="stat-value" id="exchange-usdt-balance">0 <span>USDT</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="inventory-content" class="content">
+            <div class="section-title">
+                <i class="fas fa-arrow-up"></i> UPGRADES
+            </div>
+            
+            <div class="inventory-item">
+                <div class="inventory-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="inventory-info">
+                    <div class="inventory-name">Click Power</div>
+                    <div class="inventory-description">Increase tokens earned per click</div>
+                    <div class="inventory-timer">
+                        <i class="fas fa-level-up-alt"></i> Level: <span id="click-power-level">1</span>
+                    </div>
+                </div>
+                <button class="button" style="padding: 10px 15px; width: auto;" onclick="upgradeClickPower()" id="click-power-cost" aria-label="Upgrade Click Power">
+                    <i class="fas fa-arrow-up"></i> <span id="click-power-cost-value">50</span>
+                </button>
+            </div>
+            
+            <div class="inventory-item">
+                <div class="inventory-icon">
+                    <i class="fas fa-battery-full"></i>
+                </div>
+                <div class="inventory-info">
+                    <div class="inventory-name">Max Energy</div>
+                    <div class="inventory-description">Increase your maximum energy capacity</div>
+                    <div class="inventory-timer">
+                        <i class="fas fa-level-up-alt"></i> Level: <span id="max-energy-level">1</span>
+                    </div>
+                </div>
+                <button class="button" style="padding: 10px 15px; width: auto;" onclick="upgradeMaxEnergy()" id="max-energy-cost" aria-label="Upgrade Max Energy">
+                    <i class="fas fa-arrow-up"></i> <span id="max-energy-cost-value">200</span>
+                </button>
+            </div>
+            
+            <div class="section-title" style="margin-top: 25px;">
+                <i class="fas fa-magic"></i> BOOSTERS
+            </div>
+            
+            <div class="inventory-item">
+                <div class="inventory-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="inventory-info">
+                    <div class="inventory-name">XP Booster</div>
+                    <div class="inventory-description">+10% XP for 1 hour</div>
+                    <div class="inventory-timer" id="xp-booster-timer"></div>
+                </div>
+                <button class="button" style="padding: 10px 15px; width: auto;" onclick="useXPBooster()" aria-label="Use XP Booster">
+                    <i class="fas fa-play"></i> (<span id="xp-booster-count">0</span>)
+                </button>
+            </div>
+            
+            <div class="inventory-item">
+                <div class="inventory-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div class="inventory-info">
+                    <div class="inventory-name">Token Multiplier</div>
+                    <div class="inventory-description">+15% Tokens for 1 hour</div>
+                    <div class="inventory-timer" id="token-multiplier-timer"></div>
+                </div>
+                <button class="button" style="padding: 10px 15px; width: auto;" onclick="useTokenMultiplier()" aria-label="Use Token Multiplier">
+                    <i class="fas fa-play"></i> (<span id="token-multiplier-count">0</span>)
+                </button>
+            </div>
+        </div>
+        
+        <div id="earn-content" class="content">
+            <div class="section-title">
+                <i class="fas fa-hand-holding-usd"></i> EARN MORE
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-dog"></i> Join Golden Dogs Airdrop
+                        <span class="badge hidden" id="earn1-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">50 NYXL</div>
+                </div>
+                <div class="quest-description">Join the Golden Dogs community and earn rewards</div>
+                <a href="https://t.me/goldendogsoffical" target="_blank" class="social-link">
+                    <i class="fab fa-telegram"></i> Join Golden Dogs
+                </a>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="earn1-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="earn1-label">0/1</span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimEarn(1)" id="earn1-button" aria-label="Claim Join Golden Dogs Airdrop">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fab fa-discord"></i> Join Discord
+                        <span class="badge hidden" id="earn2-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">50 NYXL</div>
+                </div>
+                <div class="quest-description">Join our Discord community and earn rewards</div>
+                <a href="https://discord.gg/nyxel" target="_blank" class="social-link">
+                    <i class="fab fa-discord"></i> Join Discord
+                </a>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="earn2-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="earn2-label">0/1</span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+                <button class="button" onclick="claimEarn(2)" id="earn2-button" aria-label="Claim Join Discord Quest">
+                    <i class="fas fa-coins"></i> CLAIM REWARD
+                </button>
+            </div>
+            
+            <div class="section-title" style="margin-top: 25px;">
+                <i class="fas fa-ad"></i> WATCH & EARN
+            </div>
+            
+            <div class="quest-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-video"></i> Watch Video Ad
+                        <span class="badge hidden" id="earn3-badge">DONE</span>
+                    </div>
+                    <div class="quest-reward">5 NYXL</div>
+                </div>
+                <div class="quest-description">Watch a short video to earn tokens</div>
+                <div class="quest-progress">
+                    <div class="progress-container">
+                        <div id="earn3-progress" class="progress-bar"></div>
+                    </div>
+                    <div class="quest-progress-text">
+                        <span id="earn3-label">0/1</span>
+                        <span>Completed</span>
+                    </div>
+                </div>
+                <button class="button info" onclick="watchAd()" id="earn3-button" aria-label="Watch Ad">
+                    <i class="fas fa-play"></i> WATCH AD
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game Data Structure
+        let gameData = {
+            tokens: 0,
+            xp: 0,
+            level: 1,
+            nextLevelXp: 100,
+            clickPower: 0.05,
+            totalClicks: 0,
+            totalEarned: 0,
+            referralEarned: 0,
+            playTime: 0,
+            energy: { current: 300, max: 300 },
+            maxEnergyLevel: 1,
+            username: "Player" + Math.floor(Math.random() * 1000),
+            usernameLocked: false,
+            referralCode: "NYX" + Math.floor(Math.random() * 1000),
+            walletAddress: "",
+            lastHourlyClaim: 0,
+            lastDailyReset: Date.now(),
+            lastWeeklyReset: Date.now(),
+            quests: [
+                { id: 1, progress: 0, target: 50, reward: 10, claimed: false, daily: true },
+                { id: 2, progress: 0, target: 1, reward: 25, claimed: false, daily: true },
+                { id: 3, progress: 0, target: 180, reward: 50, claimed: false, daily: true },
+                { id: 4, progress: 0, target: 500, reward: 100, claimed: false, weekly: true },
+                { id: 5, progress: 0, target: 5, reward: 250, claimed: false, weekly: true },
+                { id: 6, progress: 0, target: 1, reward: 25, claimed: false, daily: true },
+                { id: 7, progress: 0, target: 1, reward: 25, claimed: false, daily: true }
+            ],
+            earnTasks: [
+                { id: 1, progress: 0, target: 1, reward: 50, claimed: false },
+                { id: 2, progress: 0, target: 1, reward: 50, claimed: false },
+                { id: 3, progress: 0, target: 1, reward: 5, claimed: false, cooldown: 0 }
+            ],
+            upgrades: {
+                clickPower: 1,
+                maxEnergy: 1
+            },
+            inventory: {
+                xpBoosters: 0,
+                tokenMultipliers: 0,
+                xpBoostEnd: 0,
+                tokenMultiplierEnd: 0
+            },
+            usdtBalance: 0,
+            exchangeRate: 0.0025,
+            pendingClaim: { type: null, id: null }
+        };
+        
+        // Game Initialization
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('intro-overlay').style.display = 'none';
+                document.getElementById('game-container').style.display = 'block';
+                loadGame();
+                checkResetTimers();
+                updateUI();
+                startPlayTimeCounter();
+                startEnergyRegen();
+                startBoosterTimers();
+                updateBadges();
+            }, 3500);
+        };
+        
+        // Save/Load Game Functions
+        function saveGame() {
+            localStorage.setItem('nyxelAirdropData', JSON.stringify(gameData));
+        }
+        
+        function loadGame() {
+            const savedData = localStorage.getItem('nyxelAirdropData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                
+                // Merge with default data to ensure all properties exist
+                gameData = {
+                    ...gameData,
+                    ...parsedData,
+                    energy: parsedData.energy || { current: 300, max: 300 },
+                    inventory: parsedData.inventory || {
+                        xpBoosters: 0,
+                        tokenMultipliers: 0,
+                        xpBoostEnd: 0,
+                        tokenMultiplierEnd: 0
+                    }
+                };
+                
+                // Update avatar with first letter of username
+                updateAvatar();
+                
+                // Check if hourly bonus is available
+                const now = Date.now();
+                const lastClaim = gameData.lastHourlyClaim || 0;
+                const hoursSinceLastClaim = Math.floor((now - lastClaim) / (1000 * 60 * 60));
+                if (hoursSinceLastClaim >= 1) {
+                    document.getElementById('hourly-bonus').disabled = false;
+                }
+                
+                // Disable username input if locked
+                if (gameData.usernameLocked) {
+                    document.getElementById('username-input').disabled = true;
+                    document.getElementById('username-button').disabled = true;
+                }
+            }
+        }
+        
+        // Reset Timers
+        function checkResetTimers() {
+            const now = Date.now();
+            const lastDailyReset = gameData.lastDailyReset || 0;
+            const lastWeeklyReset = gameData.lastWeeklyReset || 0;
+            
+            // Daily reset (24 hours)
+            if (now - lastDailyReset >= 24 * 60 * 60 * 1000) {
+                gameData.quests.forEach(quest => {
+                    if (quest.daily) {
+                        quest.progress = 0;
+                        quest.claimed = false;
+                    }
+                });
+                gameData.earnTasks.forEach(task => {
+                    if (!task.cooldown) {
+                        task.progress = 0;
+                        task.claimed = false;
+                    }
+                });
+                gameData.lastDailyReset = now;
+            }
+            
+            // Weekly reset (7 days)
+            if (now - lastWeeklyReset >= 7 * 24 * 60 * 60 * 1000) {
+                gameData.quests.forEach(quest => {
+                    if (quest.weekly) {
+                        quest.progress = 0;
+                        quest.claimed = false;
+                    }
+                });
+                gameData.lastWeeklyReset = now;
+            }
+            
+            saveGame();
+        }
+        
+        // UI Update Functions
+        function updateUI() {
+            // Main stats
+            document.getElementById('token-count').textContent = gameData.tokens.toFixed(2);
+            document.getElementById('usdt-count').textContent = gameData.usdtBalance.toFixed(4);
+            document.getElementById('xp-count').textContent = Math.floor(gameData.xp);
+            document.getElementById('level-count').textContent = gameData.level;
+            document.getElementById('click-reward').textContent = `+${gameData.clickPower.toFixed(2)} NYXL`;
+            
+            // Energy bar
+            const energyPercentage = (gameData.energy.current / gameData.energy.max) * 100;
+            document.getElementById('energy-bar').style.width = `${energyPercentage}%`;
+            document.getElementById('energy-label').textContent = `${Math.floor(gameData.energy.current)}/${gameData.energy.max}`;
+            
+            // XP bar
+            const xpPercentage = (gameData.xp / gameData.nextLevelXp) * 100;
+            document.getElementById('xp-progress').style.width = `${Math.min(xpPercentage, 100)}%`;
+            document.getElementById('xp-label').textContent = `${Math.floor(gameData.xp)}/${gameData.nextLevelXp}`;
+            
+            // Profile
+            document.getElementById('username').textContent = gameData.username;
+            document.getElementById('referral-code').textContent = gameData.referralCode;
+            document.getElementById('total-clicks').textContent = gameData.totalClicks;
+            document.getElementById('total-earned').textContent = gameData.totalEarned.toFixed(2);
+            document.getElementById('referral-earned').textContent = gameData.referralEarned.toFixed(2);
+            document.getElementById('play-time').textContent = gameData.playTime;
+            document.getElementById('wallet-input').value = gameData.walletAddress;
+            
+            // Exchange
+            document.getElementById('exchange-nyxl-balance').textContent = gameData.tokens.toFixed(2);
+            document.getElementById('exchange-usdt-balance').textContent = gameData.usdtBalance.toFixed(4);
+            
+            // Upgrades
+            document.getElementById('click-power-level').textContent = gameData.upgrades.clickPower;
+            document.getElementById('max-energy-level').textContent = gameData.upgrades.maxEnergy;
+            
+            const clickPowerCost = 50 * Math.pow(1.5, gameData.upgrades.clickPower - 1);
+            document.getElementById('click-power-cost-value').textContent = clickPowerCost.toFixed(0);
+            
+            const maxEnergyCost = 200 * Math.pow(1.8, gameData.upgrades.maxEnergy - 1);
+            document.getElementById('max-energy-cost-value').textContent = maxEnergyCost.toFixed(0);
+            
+            // Inventory
+            document.getElementById('xp-booster-count').textContent = gameData.inventory.xpBoosters;
+            document.getElementById('token-multiplier-count').textContent = gameData.inventory.tokenMultipliers;
+            
+            // Update quests and earn tasks
+            updateQuestsUI();
+            updateEarnUI();
+        }
+        
+        function updateAvatar() {
+            const firstLetter = gameData.username.charAt(0).toUpperCase();
+            document.getElementById('profile-avatar').textContent = firstLetter;
+        }
+        
+        function updateQuestsUI() {
+            gameData.quests.forEach(quest => {
+                const progressBar = document.getElementById(`quest${quest.id}-progress`);
+                const progressLabel = document.getElementById(`quest${quest.id}-label`);
+                const button = document.getElementById(`quest${quest.id}-button`);
+                const badge = document.getElementById(`quest${quest.id}-badge`);
+                
+                if (!progressBar || !progressLabel || !button || !badge) return;
+                
+                const progressPercentage = (quest.progress / quest.target) * 100;
+                progressBar.style.width = `${Math.min(progressPercentage, 100)}%`;
+                progressLabel.textContent = `${quest.progress}/${quest.target}`;
+                
+                if (quest.progress >= quest.target && !quest.claimed) {
+                    button.disabled = false;
+                    button.classList.add('claimable');
+                    button.innerHTML = `<i class="fas fa-coins"></i> CLAIM ${quest.reward} NYXL`;
+                    badge.classList.add('hidden');
+                } else if (quest.claimed) {
+                    button.disabled = true;
+                    button.classList.remove('claimable');
+                    button.innerHTML = `<i class="fas fa-check"></i> CLAIMED`;
+                    badge.classList.remove('hidden');
+                } else {
+                    button.disabled = true;
+                    button.classList.remove('claimable');
+                    button.innerHTML = `<i class="fas fa-lock"></i> ${quest.reward} NYXL`;
+                    badge.classList.add('hidden');
+                }
+            });
+        }
+        
+        function updateEarnUI() {
+            gameData.earnTasks.forEach(task => {
+                const progressBar = document.getElementById(`earn${task.id}-progress`);
+                const progressLabel = document.getElementById(`earn${task.id}-label`);
+                const button = document.getElementById(`earn${task.id}-button`);
+                const badge = document.getElementById(`earn${task.id}-badge`);
+                
+                if (!progressBar || !progressLabel || !button || !badge) return;
+                
+                const progressPercentage = (task.progress / task.target) * 100;
+                progressBar.style.width = `${Math.min(progressPercentage, 100)}%`;
+                progressLabel.textContent = `${task.progress}/${task.target}`;
+                
+                if (task.progress >= task.target && !task.claimed) {
+                    button.disabled = false;
+                    button.classList.add('claimable');
+                    button.innerHTML = `<i class="fas fa-coins"></i> CLAIM ${task.reward} NYXL`;
+                    badge.classList.add('hidden');
+                } else if (task.claimed) {
+                    button.disabled = true;
+                    button.classList.remove('claimable');
+                    button.innerHTML = `<i class="fas fa-check"></i> CLAIMED`;
+                    badge.classList.remove('hidden');
+                } else if (task.cooldown && task.cooldown > Date.now()) {
+                    const minutesLeft = Math.ceil((task.cooldown - Date.now()) / (1000 * 60));
+                    button.disabled = true;
+                    button.classList.remove('claimable');
+                    button.innerHTML = `<i class="fas fa-clock"></i> ${minutesLeft}m`;
+                    badge.classList.add('hidden');
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('claimable');
+                    button.innerHTML = task.id === 3 ? 
+                        `<i class="fas fa-play"></i> WATCH AD` : 
+                        `<i class="fas fa-coins"></i> ${task.reward} NYXL`;
+                    badge.classList.add('hidden');
+                }
+            });
+        }
+        
+        function updateBadges() {
+            // Update tab badges based on available claims
+            let mainBadge = 0;
+            let questsBadge = 0;
+            let earnBadge = 0;
+            let inventoryBadge = 0;
+            
+            // Check hourly bonus
+            const now = Date.now();
+            const hoursSinceLastClaim = Math.floor((now - gameData.lastHourlyClaim) / (1000 * 60 * 60));
+            if (hoursSinceLastClaim >= 1) {
+                mainBadge++;
+            }
+            
+            // Check quests
+            gameData.quests.forEach(quest => {
+                if (quest.progress >= quest.target && !quest.claimed) {
+                    questsBadge++;
+                }
+            });
+            
+            // Check earn tasks
+            gameData.earnTasks.forEach(task => {
+                if (task.progress >= task.target && !task.claimed) {
+                    earnBadge++;
+                }
+            });
+            
+            // Check boosters
+            if (gameData.inventory.xpBoosters > 0 || gameData.inventory.tokenMultipliers > 0) {
+                inventoryBadge = gameData.inventory.xpBoosters + gameData.inventory.tokenMultipliers;
+            }
+            
+            // Update badge visibility
+            document.getElementById('main-badge').textContent = mainBadge;
+            document.getElementById('main-badge').classList.toggle('hidden', mainBadge === 0);
+            
+            document.getElementById('quests-badge').textContent = questsBadge;
+            document.getElementById('quests-badge').classList.toggle('hidden', questsBadge === 0);
+            
+            document.getElementById('earn-badge').textContent = earnBadge;
+            document.getElementById('earn-badge').classList.toggle('hidden', earnBadge === 0);
+            
+            document.getElementById('inventory-badge').textContent = inventoryBadge;
+            document.getElementById('inventory-badge').classList.toggle('hidden', inventoryBadge === 0);
+        }
+        
+        // Game Mechanics
+        function mineToken(event) {
+            if (gameData.energy.current < 1) {
+                showNotification("Not enough energy! Wait for it to regenerate", "warning");
+                return;
+            }
+            
+            createClickEffect(event);
+            
+            let tokensEarned = gameData.clickPower;
+            let xpEarned = 1; // Base XP
+            
+            // Apply boosters if active
+            if (gameData.inventory.tokenMultiplierEnd > Date.now()) {
+                tokensEarned *= 1.15;
+            }
+            if (gameData.inventory.xpBoostEnd > Date.now()) {
+                xpEarned *= 1.1;
+            }
+            
+            // Update game state
+            gameData.energy.current -= 1;
+            gameData.tokens += tokensEarned;
+            gameData.xp += xpEarned;
+            gameData.totalClicks++;
+            gameData.totalEarned += tokensEarned;
+            
+            // Update quest progress
+            gameData.quests[0].progress++; // Click 50 times
+            gameData.quests[3].progress++; // Click 500 times
+            
+            // Check level up
+            if (gameData.xp >= gameData.nextLevelXp) {
+                gameData.level++;
+                gameData.xp -= gameData.nextLevelXp;
+                gameData.nextLevelXp = Math.floor(gameData.nextLevelXp * 1.5);
+                const levelReward = gameData.level * 5;
+                gameData.tokens += levelReward;
+                showLevelUpAnimation(levelReward);
+                
+                // Increase click power with level
+                gameData.clickPower = 0.05 * (1 + (gameData.level - 1) * 0.1);
+            }
+            
+            // Update UI
+            updateUI();
+            updateBadges();
+            saveGame();
+        }
+        
+        function claimHourlyBonus() {
+            const now = Date.now();
+            const hoursSinceLastClaim = Math.floor((now - gameData.lastHourlyClaim) / (1000 * 60 * 60));
+            
+            if (hoursSinceLastClaim >= 1) {
+                const bonus = 10 + (gameData.level * 2);
+                gameData.tokens += bonus;
+                gameData.totalEarned += bonus;
+                gameData.lastHourlyClaim = now;
+                
+                showNotification(`Claimed ${bonus} NYXL Hourly Bonus!`, "success");
+                document.getElementById('hourly-bonus').disabled = true;
+                
+                updateUI();
+                updateBadges();
+                saveGame();
+            } else {
+                const minutesLeft = 60 - Math.floor((now - gameData.lastHourlyClaim) / (1000 * 60)) % 60;
+                showNotification(`Wait ${minutesLeft} minutes for next bonus`, "info");
+            }
+        }
+        
+        function openReferral() {
+            const referralLink = `https://t.me/nyxelairdropbot?start=${gameData.referralCode}`;
+            const message = `📩 Invite friends and earn 10% of their tokens!\n\nYour referral code: ${gameData.referralCode}\n\nShare this link: ${referralLink}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join Nyxel Airdrop',
+                    text: message,
+                    url: referralLink
+                }).catch(err => {
+                    alert(message);
+                });
+            } else {
+                alert(message);
+            }
+            
+            // Update quest progress
+            gameData.quests[1].progress = Math.min(gameData.quests[1].progress + 1, gameData.quests[1].target);
+            gameData.quests[4].progress = Math.min(gameData.quests[4].progress + 1, gameData.quests[4].target);
+            
+            updateUI();
+            updateBadges();
+            saveGame();
+        }
+        
+        function changeUsername() {
+            if (gameData.usernameLocked) {
+                showNotification("Username change is locked", "warning");
+                return;
+            }
+            
+            const newUsername = document.getElementById('username-input').value.trim();
+            
+            if (!newUsername || newUsername.length < 3 || newUsername.length > 15) {
+                showNotification("Username must be 3-15 characters", "warning");
+                return;
+            }
+            
+            gameData.username = newUsername;
+            gameData.usernameLocked = true;
+            document.getElementById('username-input').disabled = true;
+            document.getElementById('username-button').disabled = true;
+            document.getElementById('username-input').value = '';
+            
+            updateAvatar();
+            updateUI();
+            saveGame();
+            
+            showNotification("Username set successfully!", "success");
+        }
+        
+        function saveWallet() {
+            const walletAddress = document.getElementById('wallet-input').value.trim();
+            
+            if (!walletAddress || walletAddress.length < 10) {
+                showNotification("Please enter a valid wallet address", "warning");
+                return;
+            }
+            
+            gameData.walletAddress = walletAddress;
+            saveGame();
+            
+            showNotification("Wallet address saved!", "success");
+        }
+        
+        function claimQuest(questId) {
+            const questIndex = questId - 1;
+            const quest = gameData.quests[questIndex];
+            
+            if (quest.progress >= quest.target && !quest.claimed) {
+                if (questId === 6 || questId === 7) {
+                    // Social quests require verification
+                    gameData.pendingClaim = { type: 'quest', id: questId };
+                    
+                    setTimeout(() => {
+                        const channel = questId === 6 ? 'X (Twitter)' : 'Telegram';
+                        if (confirm(`✅ Did you join our ${channel} channel?`)) {
+                            completeQuestClaim(questIndex);
+                        } else {
+                            gameData.pendingClaim = { type: null, id: null };
+                        }
+                    }, 1000);
+                } else {
+                    completeQuestClaim(questIndex);
+                }
+            }
+        }
+        
+        function completeQuestClaim(questIndex) {
+            const quest = gameData.quests[questIndex];
+            gameData.tokens += quest.reward;
+            gameData.totalEarned += quest.reward;
+            quest.claimed = true;
+            
+            const channel = questIndex === 5 ? 'X' : questIndex === 6 ? 'Telegram' : '';
+            const message = channel ? 
+                `Claimed ${quest.reward} NYXL for joining ${channel}!` : 
+                `Claimed ${quest.reward} NYXL for completing the quest!`;
+            
+            showNotification(message, "success");
+            
+            updateUI();
+            updateBadges();
+            saveGame();
+        }
+        
+        function claimEarn(taskId) {
+            const taskIndex = taskId - 1;
+            const task = gameData.earnTasks[taskIndex];
+            
+            if (task.progress >= task.target && !task.claimed) {
+                if (taskId === 1 || taskId === 2) {
+                    // Social tasks require verification
+                    gameData.pendingClaim = { type: 'earn', id: taskId };
+                    
+                    setTimeout(() => {
+                        const platform = taskId === 1 ? 'Golden Dogs' : 'Discord';
+                        if (confirm(`✅ Did you join our ${platform} community?`)) {
+                            completeEarnClaim(taskIndex);
+                        } else {
+                            gameData.pendingClaim = { type: null, id: null };
+                        }
+                    }, 1000);
+                } else {
+                    completeEarnClaim(taskIndex);
+                }
+            }
+        }
+        
+        function completeEarnClaim(taskIndex) {
+            const task = gameData.earnTasks[taskIndex];
+            gameData.tokens += task.reward;
+            gameData.totalEarned += task.reward;
+            task.claimed = true;
+            
+            // Set cooldown for watch ad task
+            if (task.cooldown) {
+                task.cooldown = Date.now() + 30 * 60 * 1000; // 30 minutes cooldown
+            }
+            
+            const platform = taskIndex === 0 ? 'Golden Dogs' : taskIndex === 1 ? 'Discord' : '';
+            const message = platform ? 
+                `Claimed ${task.reward} NYXL for joining ${platform}!` : 
+                `Claimed ${task.reward} NYXL for watching the ad!`;
+            
+            showNotification(message, "success");
+            
+            updateUI();
+            updateBadges();
+            saveGame();
+        }
+        
+        function watchAd() {
+            // Simulate watching an ad
+            showNotification("Watching ad...", "info");
+            
+            setTimeout(() => {
+                gameData.earnTasks[2].progress = 1;
+                updateUI();
+                updateBadges();
+                
+                setTimeout(() => {
+                    claimEarn(3);
+                }, 1000);
+            }, 3000);
+        }
+        
+        function upgradeClickPower() {
+            const cost = 50 * Math.pow(1.5, gameData.upgrades.clickPower - 1);
+            
+            if (gameData.tokens >= cost) {
+                gameData.tokens -= cost;
+                gameData.upgrades.clickPower++;
+                gameData.clickPower = 0.05 * (1 + (gameData.upgrades.clickPower - 1) * 0.2);
+                
+                showNotification("Click Power Upgraded!", "success");
+                updateUI();
+                saveGame();
+            } else {
+                showNotification("Not enough NYXL tokens!", "warning");
+            }
+        }
+        
+        function upgradeMaxEnergy() {
+            const cost = 200 * Math.pow(1.8, gameData.upgrades.maxEnergy - 1);
+            
+            if (gameData.tokens >= cost) {
+                gameData.tokens -= cost;
+                gameData.upgrades.maxEnergy++;
+                gameData.energy.max += 50;
+                gameData.energy.current = Math.min(gameData.energy.current, gameData.energy.max);
+                
+                showNotification("Max Energy Upgraded!", "success");
+                updateUI();
+                saveGame();
+            } else {
+                showNotification("Not enough NYXL tokens!", "warning");
+            }
+        }
+        
+        function useXPBooster() {
+            if (gameData.inventory.xpBoosters > 0 && gameData.inventory.xpBoostEnd <= Date.now()) {
+                gameData.inventory.xpBoosters--;
+                gameData.inventory.xpBoostEnd = Date.now() + 60 * 60 * 1000; // 1 hour
+                
+                showNotification("XP Booster Activated! +10% XP for 1 hour", "success");
+                updateUI();
+                updateBadges();
+                saveGame();
+            } else if (gameData.inventory.xpBoostEnd > Date.now()) {
+                showNotification("XP Booster is already active!", "info");
+            } else {
+                showNotification("No XP Boosters available!", "warning");
+            }
+        }
+        
+        function useTokenMultiplier() {
+            if (gameData.inventory.tokenMultipliers > 0 && gameData.inventory.tokenMultiplierEnd <= Date.now()) {
+                gameData.inventory.tokenMultipliers--;
+                gameData.inventory.tokenMultiplierEnd = Date.now() + 60 * 60 * 1000; // 1 hour
+                
+                showNotification("Token Multiplier Activated! +15% Tokens for 1 hour", "success");
+                updateUI();
+                updateBadges();
+                saveGame();
+            } else if (gameData.inventory.tokenMultiplierEnd > Date.now()) {
+                showNotification("Token Multiplier is already active!", "info");
+            } else {
+                showNotification("No Token Multipliers available!", "warning");
+            }
+        }
+        
+        function swapToUSDT() {
+            const nyxlInput = document.getElementById('nyxl-amount');
+            const nyxlAmount = parseFloat(nyxlInput.value);
+            
+            if (isNaN(nyxlAmount) || nyxlAmount <= 0) {
+                showNotification("Please enter a valid NYXL amount", "warning");
+                return;
+            }
+            
+            if (nyxlAmount > gameData.tokens) {
+                showNotification("Not enough NYXL tokens!", "warning");
+                return;
+            }
+            
+            const usdtAmount = nyxlAmount * gameData.exchangeRate;
+            
+            gameData.tokens -= nyxlAmount;
+            gameData.usdtBalance += usdtAmount;
+            
+            nyxlInput.value = '';
+            document.getElementById('usdt-amount').value = '';
+            
+            showNotification(`Swapped ${nyxlAmount.toFixed(2)} NYXL to ${usdtAmount.toFixed(4)} USDT`, "success");
+            
+            updateUI();
+            saveGame();
+        }
+        
+        // UI Helpers
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-content`).classList.add('active');
+        }
+        
+        function showNotification(message, type = "success") {
+            const icon = {
+                success: "fa-check-circle",
+                warning: "fa-exclamation-circle",
+                info: "fa-info-circle",
+                error: "fa-times-circle"
+            }[type];
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        function createClickEffect(event) {
+            const clicker = document.getElementById('clicker');
+            const rect = clicker.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x - 10}px`;
+            effect.style.top = `${y - 10}px`;
+            effect.style.backgroundColor = `hsl(${Math.random() * 60 + 30}, 100%, 70%)`;
+            
+            clicker.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 500);
+        }
+        
+        function showLevelUpAnimation(reward) {
+            const clicker = document.getElementById('clicker');
+            
+            // Create particles
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = `${Math.random() * 10 + 5}px`;
+                particle.style.height = particle.style.width;
+                particle.style.left = `${50 + (Math.random() * 20 - 10)}%`;
+                particle.style.top = `${50 + (Math.random() * 20 - 10)}%`;
+                particle.style.backgroundColor = `hsl(${Math.random() * 60 + 30}, 100%, 50%)`;
+                
+                clicker.appendChild(particle);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 100 + 50;
+                const duration = Math.random() * 1000 + 500;
+                
+                particle.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+                });
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, duration);
+            }
+            
+            // Create level up message
+            const rewardMsg = document.createElement('div');
+            rewardMsg.innerHTML = `🏆 LEVEL UP! +${reward} NYXL`;
+            rewardMsg.style.position = 'absolute';
+            rewardMsg.style.top = '50%';
+            rewardMsg.style.left = '50%';
+            rewardMsg.style.transform = 'translate(-50%, -50%)';
+            rewardMsg.style.color = 'var(--accent)';
+            rewardMsg.style.fontSize = '16px';
+            rewardMsg.style.fontWeight = 'bold';
+            rewardMsg.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
+            rewardMsg.style.zIndex = '20';
+            rewardMsg.style.animation = 'fadeOut 2s forwards';
+            
+            clicker.appendChild(rewardMsg);
+            
+            setTimeout(() => {
+                rewardMsg.remove();
+            }, 2000);
+        }
+        
+        // Background Timers
+        function startPlayTimeCounter() {
+            setInterval(() => {
+                gameData.playTime++;
+                
+                // Update play time quest
+                if (gameData.quests[2].progress < gameData.quests[2].target) {
+                    gameData.quests[2].progress++;
+                }
+                
+                // Check for daily/weekly resets
+                checkResetTimers();
+                
+                updateUI();
+                updateBadges();
+                saveGame();
+            }, 60000); // Every minute
+        }
+        
+        function startEnergyRegen() {
+            setInterval(() => {
+                if (gameData.energy.current < gameData.energy.max) {
+                    gameData.energy.current = Math.min(gameData.energy.current + 1, gameData.energy.max);
+                    updateUI();
+                    saveGame();
+                }
+            }, 12000); // Every 12 seconds
+        }
+        
+        function startBoosterTimers() {
+            setInterval(() => {
+                const now = Date.now();
+                
+                // Update XP booster timer
+                if (gameData.inventory.xpBoostEnd > now) {
+                    const minutesLeft = Math.floor((gameData.inventory.xpBoostEnd - now) / 60000);
+                    document.getElementById('xp-booster-timer').textContent = `Active: ${minutesLeft}m left`;
+                } else {
+                    document.getElementById('xp-booster-timer').textContent = '';
+                }
+                
+                // Update token multiplier timer
+                if (gameData.inventory.tokenMultiplierEnd > now) {
+                    const minutesLeft = Math.floor((gameData.inventory.tokenMultiplierEnd - now) / 60000);
+                    document.getElementById('token-multiplier-timer').textContent = `Active: ${minutesLeft}m left`;
+                } else {
+                    document.getElementById('token-multiplier-timer').textContent = '';
+                }
+                
+                // Update watch ad cooldown
+                if (gameData.earnTasks[2].cooldown > now) {
+                    const minutesLeft = Math.ceil((gameData.earnTasks[2].cooldown - now) / 60000);
+                    document.getElementById('earn3-button').innerHTML = `<i class="fas fa-clock"></i> ${minutesLeft}m`;
+                } else if (gameData.earnTasks[2].progress < 1) {
+                    document.getElementById('earn3-button').innerHTML = `<i class="fas fa-play"></i> WATCH AD`;
+                }
+                
+                updateUI();
+            }, 1000); // Every second
+        }
+        
+        // Input Handlers
+        document.getElementById('nyxl-amount').addEventListener('input', function() {
+            const nyxlAmount = parseFloat(this.value);
+            if (!isNaN(nyxlAmount) && nyxlAmount > 0) {
+                const usdtValue = nyxlAmount * gameData.exchangeRate;
+                document.getElementById('usdt-amount').value = usdtValue.toFixed(4);
+            } else {
+                document.getElementById('usdt-amount').value = '';
+            }
+        });
+    </script>
+</body>
+</html>
