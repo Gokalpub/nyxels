@@ -1296,59 +1296,6 @@
                     <i class="fas fa-coins"></i> CLAIM REWARD
                 </button>
             </div>
-            
-            <div class="quest-card">
-                <div class="quest-header">
-                    <div class="quest-title">
-                        <i class="fab fa-discord"></i> Join Discord
-                        <span class="badge hidden" id="earn2-badge">DONE</span>
-                    </div>
-                    <div class="quest-reward">50 NYXL</div>
-                </div>
-                <div class="quest-description">Join our Discord community and earn rewards</div>
-                <a href="https://discord.gg/nyxel" target="_blank" class="social-link">
-                    <i class="fab fa-discord"></i> Join Discord
-                </a>
-                <div class="quest-progress">
-                    <div class="progress-container">
-                        <div id="earn2-progress" class="progress-bar"></div>
-                    </div>
-                    <div class="quest-progress-text">
-                        <span id="earn2-label">0/1</span>
-                        <span>Completed</span>
-                    </div>
-                </div>
-                <button class="button" onclick="claimEarn(2)" id="earn2-button" aria-label="Claim Join Discord Quest">
-                    <i class="fas fa-coins"></i> CLAIM REWARD
-                </button>
-            </div>
-            
-            <div class="section-title" style="margin-top: 25px;">
-                <i class="fas fa-ad"></i> WATCH & EARN
-            </div>
-            
-            <div class="quest-card">
-                <div class="quest-header">
-                    <div class="quest-title">
-                        <i class="fas fa-video"></i> Watch Video Ad
-                        <span class="badge hidden" id="earn3-badge">DONE</span>
-                    </div>
-                    <div class="quest-reward">5 NYXL</div>
-                </div>
-                <div class="quest-description">Watch a short video to earn tokens</div>
-                <div class="quest-progress">
-                    <div class="progress-container">
-                        <div id="earn3-progress" class="progress-bar"></div>
-                    </div>
-                    <div class="quest-progress-text">
-                        <span id="earn3-label">0/1</span>
-                        <span>Completed</span>
-                    </div>
-                </div>
-                <button class="button info" onclick="watchAd()" id="earn3-button" aria-label="Watch Ad">
-                    <i class="fas fa-play"></i> WATCH AD
-                </button>
-            </div>
         </div>
     </div>
     
@@ -1383,9 +1330,7 @@
                 { id: 7, progress: 0, target: 1, reward: 25, claimed: false, daily: true }
             ],
             earnTasks: [
-                { id: 1, progress: 0, target: 1, reward: 50, claimed: false },
-                { id: 2, progress: 0, target: 1, reward: 50, claimed: false },
-                { id: 3, progress: 0, target: 1, reward: 5, claimed: false, cooldown: 0 }
+                { id: 1, progress: 0, target: 1, reward: 50, claimed: false }
             ],
             upgrades: {
                 clickPower: 1,
@@ -1474,10 +1419,8 @@
                     }
                 });
                 gameData.earnTasks.forEach(task => {
-                    if (!task.cooldown) {
-                        task.progress = 0;
-                        task.claimed = false;
-                    }
+                    task.progress = 0;
+                    task.claimed = false;
                 });
                 gameData.lastDailyReset = now;
             }
@@ -1607,18 +1550,10 @@
                     button.classList.remove('claimable');
                     button.innerHTML = `<i class="fas fa-check"></i> CLAIMED`;
                     badge.classList.remove('hidden');
-                } else if (task.cooldown && task.cooldown > Date.now()) {
-                    const minutesLeft = Math.ceil((task.cooldown - Date.now()) / (1000 * 60));
-                    button.disabled = true;
-                    button.classList.remove('claimable');
-                    button.innerHTML = `<i class="fas fa-clock"></i> ${minutesLeft}m`;
-                    badge.classList.add('hidden');
                 } else {
                     button.disabled = false;
                     button.classList.remove('claimable');
-                    button.innerHTML = task.id === 3 ? 
-                        `<i class="fas fa-play"></i> WATCH AD` : 
-                        `<i class="fas fa-coins"></i> ${task.reward} NYXL`;
+                    button.innerHTML = `<i class="fas fa-coins"></i> ${task.reward} NYXL`;
                     badge.classList.add('hidden');
                 }
             });
@@ -1854,13 +1789,12 @@
             const task = gameData.earnTasks[taskIndex];
             
             if (task.progress >= task.target && !task.claimed) {
-                if (taskId === 1 || taskId === 2) {
+                if (taskId === 1) {
                     // Social tasks require verification
                     gameData.pendingClaim = { type: 'earn', id: taskId };
                     
                     setTimeout(() => {
-                        const platform = taskId === 1 ? 'Golden Dogs' : 'Discord';
-                        if (confirm(`✅ Did you join our ${platform} community?`)) {
+                        if (confirm(`✅ Did you join the Golden Dogs community?`)) {
                             completeEarnClaim(taskIndex);
                         } else {
                             gameData.pendingClaim = { type: null, id: null };
@@ -1878,36 +1812,16 @@
             gameData.totalEarned += task.reward;
             task.claimed = true;
             
-            // Set cooldown for watch ad task
-            if (task.cooldown) {
-                task.cooldown = Date.now() + 30 * 60 * 1000; // 30 minutes cooldown
-            }
-            
-            const platform = taskIndex === 0 ? 'Golden Dogs' : taskIndex === 1 ? 'Discord' : '';
+            const platform = taskIndex === 0 ? 'Golden Dogs' : '';
             const message = platform ? 
                 `Claimed ${task.reward} NYXL for joining ${platform}!` : 
-                `Claimed ${task.reward} NYXL for watching the ad!`;
+                `Claimed ${task.reward} NYXL!`;
             
             showNotification(message, "success");
             
             updateUI();
             updateBadges();
             saveGame();
-        }
-        
-        function watchAd() {
-            // Simulate watching an ad
-            showNotification("Watching ad...", "info");
-            
-            setTimeout(() => {
-                gameData.earnTasks[2].progress = 1;
-                updateUI();
-                updateBadges();
-                
-                setTimeout(() => {
-                    claimEarn(3);
-                }, 1000);
-            }, 3000);
         }
         
         function upgradeClickPower() {
@@ -2154,14 +2068,6 @@
                     document.getElementById('token-multiplier-timer').textContent = `Active: ${minutesLeft}m left`;
                 } else {
                     document.getElementById('token-multiplier-timer').textContent = '';
-                }
-                
-                // Update watch ad cooldown
-                if (gameData.earnTasks[2].cooldown > now) {
-                    const minutesLeft = Math.ceil((gameData.earnTasks[2].cooldown - now) / 60000);
-                    document.getElementById('earn3-button').innerHTML = `<i class="fas fa-clock"></i> ${minutesLeft}m`;
-                } else if (gameData.earnTasks[2].progress < 1) {
-                    document.getElementById('earn3-button').innerHTML = `<i class="fas fa-play"></i> WATCH AD`;
                 }
                 
                 updateUI();
