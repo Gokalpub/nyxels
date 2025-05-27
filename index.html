@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap'); /* Yeni bir bilim kurgu fontu */
 
         :root {
             --primary: #4B0082; /* Deep Purple */
@@ -21,6 +22,8 @@
             --gray: #9e9e9e;
             --dark-purple: #3a0050; /* Even deeper purple */
             --cosmic-shard: #FFD700; /* Gold for Cosmic Shards */
+            --neon-glow-cyan: 0 0 8px #00bcd4, 0 0 15px #00bcd4; /* Neon glow for accent */
+            --neon-glow-purple: 0 0 8px #8A2BE2, 0 0 15px #8A2BE2; /* Neon glow for secondary */
         }
         
         * {
@@ -31,13 +34,30 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--dark);
+            background: radial-gradient(circle at top left, #1a013a, #0a011a 70%); /* More dynamic background */
             color: var(--light);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             touch-action: manipulation;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background grid/pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 25px 25px;
+            z-index: -1;
+            opacity: 0.8;
         }
         
         .container {
@@ -52,7 +72,7 @@
             text-align: center;
             border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), var(--neon-glow-purple); /* Added neon glow */
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
@@ -77,10 +97,11 @@
         .header h1 {
             margin: 0;
             color: white;
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 28px; /* Larger font size */
+            font-weight: 800;
             position: relative;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,255,255,0.3); /* Stronger shadow */
+            font-family: 'Orbitron', sans-serif; /* Sci-fi font */
         }
         
         .header p {
@@ -96,7 +117,7 @@
             background-color: rgba(255,255,255,0.08);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), var(--neon-glow-cyan); /* Added neon glow */
             position: relative;
             z-index: 1;
             border: 1px solid rgba(255,255,255,0.1);
@@ -127,6 +148,7 @@
             color: var(--dark);
             font-weight: 600;
             border-bottom: 3px solid var(--light);
+            text-shadow: 0 0 5px rgba(255,255,255,0.5); /* Active tab text shadow */
         }
         
         .tab:hover:not(.active) {
@@ -155,9 +177,11 @@
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2), inset 0 0 10px rgba(0,188,212,0.1); /* Inner shadow for content */
             border: 1px solid rgba(255,255,255,0.1);
             display: none;
+            position: relative; /* For particle effects */
+            overflow: hidden; /* For particle effects */
         }
         
         .content.active {
@@ -179,7 +203,7 @@
             margin-bottom: 20px;
             cursor: pointer;
             user-select: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.15);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.15), var(--neon-glow-cyan); /* Added neon glow */
             transition: transform 0.1s, box-shadow 0.1s;
             position: relative;
             overflow: hidden;
@@ -210,10 +234,10 @@
         
         /* Basic Diamond Animation with subtle shine */
         .token-icon {
-            font-size: 60px;
+            font-size: 70px; /* Slightly larger icon */
             margin-bottom: 10px;
             color: var(--accent);
-            text-shadow: 0 0 10px rgba(0,188,212,0.5);
+            text-shadow: var(--neon-glow-cyan); /* Neon glow for diamond */
             animation: rotateY 4s infinite linear;
             position: relative;
         }
@@ -248,13 +272,14 @@
         }
         
         .click-reward {
-            font-size: 16px;
+            font-size: 18px; /* Larger click reward text */
             font-weight: 600;
             color: var(--accent);
             margin-top: 10px;
             opacity: 0;
             transform: translateY(10px);
             transition: all 0.3s;
+            text-shadow: var(--neon-glow-cyan);
         }
         
         .click-area:active .click-reward {
@@ -282,6 +307,7 @@
             overflow: hidden;
             position: relative;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1); /* Border for progress bar */
         }
         
         .progress-bar {
@@ -290,6 +316,7 @@
             border-radius: 6px;
             width: 0%;
             transition: width 0.5s ease;
+            box-shadow: 0 0 8px rgba(0,188,212,0.5); /* Glow for progress bar */
         }
         
         .stat-grid {
@@ -306,6 +333,20 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: inset 0 0 0 1px rgba(0,188,212,0.2); /* Subtle inner glow on cards */
+            pointer-events: none;
         }
         
         .stat-label {
@@ -315,13 +356,14 @@
         }
         
         .stat-value {
-            font-size: 18px;
+            font-size: 20px; /* Larger stat values */
             font-weight: 700;
             color: white;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
         }
         
         .stat-value span {
-            font-size: 12px;
+            font-size: 14px; /* Larger unit text */
             color: var(--accent);
         }
         
@@ -344,11 +386,32 @@
             justify-content: center;
             gap: 8px;
             border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.5s ease-out;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+
+        .button:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
         }
         
         .button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3), var(--neon-glow-cyan); /* Hover glow */
         }
         
         .button:active {
@@ -387,18 +450,20 @@
         }
         
         .section-title {
-            font-size: 16px;
+            font-size: 18px; /* Larger section title */
             font-weight: 700;
             color: var(--accent);
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
-            text-shadow: 0 0 5px rgba(0,188,212,0.3);
+            text-shadow: var(--neon-glow-cyan); /* Neon glow for title */
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
         }
         
         .section-title i {
-            font-size: 18px;
+            font-size: 20px; /* Larger icon in title */
         }
         
         .quest-card, .earn-card {
@@ -406,8 +471,10 @@
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), inset 0 0 5px rgba(255,255,255,0.1); /* Inner shadow for cards */
             border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
         }
         
         .quest-header {
@@ -418,11 +485,12 @@
         }
         
         .quest-title {
-            font-size: 14px;
+            font-size: 16px; /* Larger quest title */
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
+            color: white;
         }
         
         .quest-title i {
@@ -430,9 +498,10 @@
         }
         
         .quest-reward {
-            font-size: 14px;
+            font-size: 16px; /* Larger reward text */
             font-weight: 700;
             color: var(--accent);
+            text-shadow: var(--neon-glow-cyan);
         }
         
         .quest-description {
@@ -613,6 +682,7 @@
             gap: 10px;
             animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s forwards;
             max-width: 90%;
+            text-align: center;
         }
         
         @keyframes slideIn {
@@ -656,6 +726,8 @@
             background-clip: text;
             text-fill-color: transparent;
             position: relative;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: var(--neon-glow-cyan);
         }
         
         .intro-logo::after {
@@ -670,6 +742,7 @@
             color: var(--accent);
             background: none;
             -webkit-text-fill-color: var(--accent);
+            text-shadow: none; /* No shadow for smaller text */
         }
         
         .intro-progress {
@@ -680,6 +753,7 @@
             overflow: hidden;
             margin-top: 30px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .intro-progress-bar {
@@ -687,6 +761,7 @@
             width: 0%;
             background: linear-gradient(90deg, var(--accent), #00e5ff);
             animation: loadProgress 3s forwards;
+            box-shadow: 0 0 8px rgba(0,188,212,0.5); /* Glow for intro progress bar */
         }
         
         @keyframes loadProgress {
@@ -732,10 +807,53 @@
         .hidden {
             display: none;
         }
+
+        .referral-input-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .referral-code-display {
+            flex-grow: 1;
+            background-color: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            text-align: center;
+            user-select: all;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .copy-button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .copy-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
         
         @media (max-width: 400px) {
             .header h1 {
-                font-size: 18px;
+                font-size: 24px; /* Adjust for smaller screens */
             }
             
             .tab {
@@ -757,6 +875,15 @@
             
             .quest-title {
                 font-size: 13px;
+            }
+
+            .notification {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            .section-title {
+                font-size: 16px;
             }
         }
     </style>
@@ -847,10 +974,7 @@
                 </div>
             </div>
             
-            <button class="button secondary" onclick="openReferral()" aria-label="Invite Friends">
-                <i class="fas fa-user-plus"></i> INVITE FRIENDS
-            </button>
-        </div>
+            </div>
         
         <div id="profile-content" class="content">
             <div class="profile-card">
@@ -858,8 +982,7 @@
                     <div class="profile-avatar" id="profile-avatar">P</div>
                     <div class="profile-details">
                         <div class="profile-username" id="username">Player123</div>
-                        <div class="profile-referral" id="referral-code">CSM123</div>
-                    </div>
+                        <div class="profile-referral" id="referral-code-profile">CSM123</div> </div>
                 </div>
                 
                 <input type="text" id="username-input" placeholder="Enter new username" class="profile-input" aria-label="Change Username">
@@ -1094,6 +1217,25 @@
             </div>
 
             <div class="section-title" style="margin-top: 25px;">
+                <i class="fas fa-user-plus"></i> INVITE FRIENDS
+            </div>
+            <div class="earn-card">
+                <div class="quest-header">
+                    <div class="quest-title">
+                        <i class="fas fa-share-alt"></i> Your Referral Link
+                    </div>
+                    <div class="quest-reward">Earn 10% of their earnings!</div>
+                </div>
+                <div class="quest-description">Share this link to invite new players and earn rewards!</div>
+                <div class="referral-input-group">
+                    <input type="text" id="referral-link-display" class="referral-code-display" readonly>
+                    <button class="copy-button" onclick="copyReferralLink()" aria-label="Copy Referral Link">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top: 25px;">
                 <i class="fas fa-tasks"></i> MORE WAYS TO EARN
             </div>
             <div class="earn-card">
@@ -1293,7 +1435,7 @@
             
             // Profile
             document.getElementById('username').textContent = gameData.username;
-            document.getElementById('referral-code').textContent = gameData.referralCode;
+            document.getElementById('referral-code-profile').textContent = gameData.referralCode; // Updated ID
             document.getElementById('total-clicks').textContent = gameData.totalClicks;
             document.getElementById('total-earned').textContent = gameData.totalEarned.toFixed(2);
             document.getElementById('referral-earned').textContent = gameData.referralEarned.toFixed(2);
@@ -1311,6 +1453,9 @@
             // Update quests
             updateQuestsUI();
             updateDailyLoginButton(); // Update daily login button state
+
+            // Update referral link in Earn section
+            document.getElementById('referral-link-display').value = `https://t.me/yourgamebot?start=${gameData.referralCode}`;
         }
         
         function updateAvatar() {
@@ -1540,15 +1685,16 @@
             }
         }
 
-        function openReferral() {
-            const referralLink = `https://t.me/yourgamebot?start=${gameData.referralCode}`;
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referral-link-display').value;
             navigator.clipboard.writeText(referralLink).then(() => {
                 showNotification('🔗 Referral link copied to clipboard!', 'info');
             }).catch(err => {
                 console.error('Failed to copy: ', err);
                 showNotification('Failed to copy referral link.', 'danger');
             });
-            updateQuestsProgress('invite', 1);
+            updateQuestsProgress('invite', 1); // This would track 1 invite, but you might want to adjust how 'invites' are actually counted.
+                                                // For a real game, this would typically be triggered by a new user joining with the referral code.
         }
 
         function changeUsername() {
