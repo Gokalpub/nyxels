@@ -24,6 +24,11 @@
             --cosmic-shard: #FFD700; /* Gold for Cosmic Shards */
             --neon-glow-cyan: 0 0 8px #00bcd4, 0 0 15px #00bcd4; /* Neon glow for accent */
             --neon-glow-purple: 0 0 8px #8A2BE2, 0 0 15px #8A2BE2; /* Neon glow for secondary */
+            
+            /* Diamond Colors for Animation */
+            --diamond-color-1: #00bcd4; /* Cyan */
+            --diamond-color-2: #8A2BE2; /* Amethyst */
+            --diamond-color-3: #FFD700; /* Gold */
         }
         
         * {
@@ -232,14 +237,16 @@
             transition: transform 0.5s, opacity 0.5s;
         }
         
-        /* Basic Diamond Animation with subtle shine */
+        /* Diamond Animation with subtle shine and color change */
         .token-icon {
             font-size: 70px; /* Slightly larger icon */
             margin-bottom: 10px;
-            color: var(--accent);
+            /* color: var(--accent); NO direct color for icon, use filter for glow */
             text-shadow: var(--neon-glow-cyan); /* Neon glow for diamond */
-            animation: rotateY 4s infinite linear;
+            animation: rotateY 8s infinite linear; /* Slower rotation */
             position: relative;
+            filter: drop-shadow(0 0 10px var(--accent)); /* Initial drop shadow */
+            animation: rotateY 8s infinite linear, token-color-change 5s infinite alternate; /* Combined animations */
         }
 
         .token-icon::before {
@@ -264,6 +271,13 @@
         @keyframes shine {
             0%, 100% { opacity: 0.5; transform: scale(1) translate(0,0); }
             50% { opacity: 0.8; transform: scale(1.1) translate(5px, -5px); }
+        }
+
+        @keyframes token-color-change {
+            0% { filter: drop-shadow(0 0 10px var(--diamond-color-1)); color: var(--diamond-color-1); }
+            33% { filter: drop-shadow(0 0 10px var(--diamond-color-2)); color: var(--diamond-color-2); }
+            66% { filter: drop-shadow(0 0 10px var(--diamond-color-3)); color: var(--diamond-color-3); }
+            100% { filter: drop-shadow(0 0 10px var(--diamond-color-1)); color: var(--diamond-color-1); }
         }
         
         .click-area:active .token-icon {
@@ -1234,22 +1248,6 @@
                     </button>
                 </div>
             </div>
-
-            <div class="section-title" style="margin-top: 25px;">
-                <i class="fas fa-tasks"></i> MORE WAYS TO EARN
-            </div>
-            <div class="earn-card">
-                <div class="quest-header">
-                    <div class="quest-title">
-                        <i class="fas fa-video"></i> Watch Ad (Coming Soon)
-                    </div>
-                    <div class="quest-reward">? CSMR</div>
-                </div>
-                <div class="quest-description">Watch a short advertisement to earn more tokens.</div>
-                <button class="button" disabled>
-                    <i class="fas fa-play-circle"></i> WATCH AD
-                </button>
-            </div>
         </div>
         
         <div id="inventory-content" class="content">
@@ -1308,8 +1306,8 @@
             usernameLocked: false,
             referralCode: "CSM" + Math.floor(Math.random() * 100000),
             lastDailyLoginClaim: 0, // New property for daily login
-            lastDailyReset: Date.now(),
-            lastWeeklyReset: Date.now(),
+            lastDailyReset: 0, // Initialize to 0 for first check
+            lastWeeklyReset: 0, // Initialize to 0 for first check
             quests: [
                 { id: 1, progress: 0, target: 50, reward: 10, claimed: false, daily: true },
                 { id: 2, progress: 0, target: 1, reward: 25, claimed: false, daily: true, track: 'invites' },
@@ -1332,7 +1330,7 @@
                 document.getElementById('intro-overlay').style.display = 'none';
                 document.getElementById('game-container').style.display = 'block';
                 loadGame();
-                checkResetTimers();
+                checkResetTimers(); // Check and reset quests if needed
                 updateUI();
                 startPlayTimeCounter();
                 startEnergyRegen();
@@ -1350,13 +1348,20 @@
             const savedData = localStorage.getItem('cosmoraAirdropData');
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
+                // Merge loaded data with default structure to ensure all properties exist
                 gameData = {
                     ...gameData,
                     ...parsedData,
                     energy: parsedData.energy || { current: 300, max: 300 },
                     upgrades: parsedData.upgrades || { clickPower: 1, maxEnergy: 1 },
-                    quests: parsedData.quests || gameData.quests,
-                    lastDailyLoginClaim: parsedData.lastDailyLoginClaim || 0, // Load daily login timestamp
+                    // Ensure quests array is deep copied and new quests are added if they exist in default
+                    quests: gameData.quests.map(defaultQuest => {
+                        const savedQuest = (parsedData.quests || []).find(q => q.id === defaultQuest.id);
+                        return savedQuest ? { ...defaultQuest, ...savedQuest } : defaultQuest;
+                    }),
+                    lastDailyLoginClaim: parsedData.lastDailyLoginClaim || 0,
+                    lastDailyReset: parsedData.lastDailyReset || 0,
+                    lastWeeklyReset: parsedData.lastWeeklyReset || 0,
                 };
                 
                 updateAvatar();
@@ -1372,12 +1377,12 @@
         // Reset Timers
         function checkResetTimers() {
             const now = Date.now();
-            const lastDailyReset = gameData.lastDailyReset || 0;
-            const lastWeeklyReset = gameData.lastWeeklyReset || 0;
             
             // Daily reset (24 hours, check if it's a new day)
-            const lastDailyDate = new Date(lastDailyReset);
+            const lastDailyDate = new Date(gameData.lastDailyReset);
             const currentDate = new Date(now);
+
+            // Check if current date is different from last daily reset date
             if (currentDate.getDate() !== lastDailyDate.getDate() || 
                 currentDate.getMonth() !== lastDailyDate.getMonth() || 
                 currentDate.getFullYear() !== lastDailyDate.getFullYear()) {
@@ -1388,17 +1393,21 @@
                         quest.claimed = false;
                     }
                 });
-                gameData.lastDailyReset = now;
+                gameData.lastDailyReset = now; // Update last daily reset timestamp
             }
             
             // Weekly reset (7 days, check if it's a new week - Monday)
             const getMonday = (d) => {
                 d = new Date(d);
                 const day = d.getDay(),
-                    diff = d.getDate() - day + (day == 0 ? -6 : 1);
-                return new Date(d.setDate(diff));
+                    // Adjust diff to get to previous Monday (1 for Monday, 0 for Sunday)
+                    diff = d.getDate() - day + (day === 0 ? -6 : 1); 
+                const monday = new Date(d.setDate(diff));
+                monday.setHours(0, 0, 0, 0); // Set to start of the day
+                return monday;
             }
-            const lastWeeklyMonday = getMonday(lastWeeklyReset);
+
+            const lastWeeklyMonday = getMonday(gameData.lastWeeklyReset);
             const currentMonday = getMonday(now);
 
             if (currentMonday.getTime() !== lastWeeklyMonday.getTime()) {
@@ -1408,7 +1417,7 @@
                         quest.claimed = false;
                     }
                 });
-                gameData.lastWeeklyReset = now;
+                gameData.lastWeeklyReset = now; // Update last weekly reset timestamp
             }
             
             saveGame();
@@ -1435,7 +1444,7 @@
             
             // Profile
             document.getElementById('username').textContent = gameData.username;
-            document.getElementById('referral-code-profile').textContent = gameData.referralCode; // Updated ID
+            document.getElementById('referral-code-profile').textContent = gameData.referralCode;
             document.getElementById('total-clicks').textContent = gameData.totalClicks;
             document.getElementById('total-earned').textContent = gameData.totalEarned.toFixed(2);
             document.getElementById('referral-earned').textContent = gameData.referralEarned.toFixed(2);
@@ -1574,7 +1583,7 @@
                 updateUI();
                 saveGame();
                 updateQuestsProgress('playTime', 1);
-            }, 60 * 1000);
+            }, 60 * 1000); // Every minute
         }
 
         function startDailyLoginTimer() {
@@ -1693,8 +1702,10 @@
                 console.error('Failed to copy: ', err);
                 showNotification('Failed to copy referral link.', 'danger');
             });
-            updateQuestsProgress('invite', 1); // This would track 1 invite, but you might want to adjust how 'invites' are actually counted.
-                                                // For a real game, this would typically be triggered by a new user joining with the referral code.
+            // This would track 1 invite, but you might want to adjust how 'invites' are actually counted.
+            // For a real game, this would typically be triggered by a new user joining with the referral code.
+            // For now, this is a placeholder.
+            // updateQuestsProgress('invite', 1); 
         }
 
         function changeUsername() {
@@ -1719,13 +1730,14 @@
                     if (type === 'click' && (quest.id === 1 || quest.id === 4)) {
                         quest.progress += amount;
                     } else if (type === 'invite' && (quest.id === 2 || quest.id === 5)) {
-                        quest.progress += amount;
+                        // This currently increments on copy referral. For a real app, this should be server-side.
+                        quest.progress += amount; 
                     } else if (type === 'playTime' && quest.id === 3) {
                         quest.progress += amount;
                     } else if (type === 'social' && quest.id === 6 && quest.track === 'social_x') {
-                        quest.progress = 1;
+                        quest.progress = 1; // Social quests are usually boolean (done/not done)
                     } else if (type === 'social' && quest.id === 7 && quest.track === 'social_telegram') {
-                        quest.progress = 1;
+                        quest.progress = 1; // Social quests are usually boolean (done/not done)
                     }
                 }
             });
