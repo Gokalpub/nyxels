@@ -1,0 +1,47 @@
+// api/index.js (Bu dosya /api adresine istek geldiğinde çalışacak)
+const mongoose = require('mongoose'); // MongoDB ile konuşmak için
+const express = require('express');   // Web adresi oluşturmak için
+const bodyParser = require('body-parser'); // Gelen veriyi okumak için
+
+const app = express();
+app.use(bodyParser.json()); // JSON formatındaki verileri kullanacağız
+
+// Buraya MongoDB Atlas'tan aldığın bağlantı dizesi gelecek.
+// Ama bunu direkt buraya yazmayacağız, Vercel'den çekeceğiz.
+// Şimdilik sadece adını yazıyoruz:
+const MONGODB_URI = process.env.MONGODB_URI; // Vercel'de tanımlayacağız
+
+let dbConnected = false; // Veritabanına bağlı mıyız, değil miyiz kontrolü
+
+// Veritabanına bağlanmayı deneyen fonksiyon
+async function connectDb() {
+    if (dbConnected) return; // Zaten bağlıysak tekrar bağlanma
+    if (!MONGODB_URI) {
+        console.error("MongoDB URI tanımlı değil! Vercel'de ortam değişkenini kontrol et.");
+        return;
+    }
+    try {
+        await mongoose.connect(MONGODB_URI); // MongoDB'ye bağlan
+        dbConnected = true; // Bağlantı başarılı
+        console.log('MongoDB Başarıyla Bağlandı!');
+    } catch (error) {
+        console.error('MongoDB bağlantı hatası:', error);
+        dbConnected = false; // Bağlantı başarısız
+    }
+}
+
+// Bu fonksiyon, Vercel'in /api adresine gelen istekleri yönetir
+// req: Gelen istek bilgileri
+// res: Cevap göndermek için
+module.exports = async (req, res) => {
+    await connectDb(); // Her API isteğinde veritabanına bağlanmayı dene
+
+    // Eğer gelen istek bir GET isteğiyse (tarayıcıdan /api yazdığında olduğu gibi)
+    if (req.method === 'GET') {
+        // Bir mesaj ve veritabanı bağlantı durumunu gönder
+        res.status(200).json({ message: 'Vercel API\'den merhaba! Veritabanı Bağlı mı: ' + dbConnected });
+    } else {
+        // Eğer GET değilse, izin verilmeyen metot hatası gönder
+        res.status(405).json({ message: 'Bu adrese sadece GET isteği yapabilirsin.' });
+    }
+};
